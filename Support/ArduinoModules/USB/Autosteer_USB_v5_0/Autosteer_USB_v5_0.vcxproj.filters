@@ -15,11 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Autosteer_USB_v5_0.ino" />
-    <None Include="AutosteerPID.ino" />
-    <None Include="AutosteerRelays.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.Autosteer_USB_v5_0.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,5 +32,8 @@
     <ClCompile Include="zADS1115.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AutosteerPID.ino" />
+    <ClCompile Include="AutosteerRelays.ino" />
+    <ClCompile Include="Autosteer_USB_v5_0.ino" />
   </ItemGroup>
 </Project>
