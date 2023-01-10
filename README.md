@@ -1,4 +1,6 @@
-# START HERE
+# AgOpenGPS PCB and Firmware Repository
+
+Click on the green "Code" button above and select "Download Zip" to download the entire support folder.
 
 Are you looking for [AgOpenGPS Repository](https://github.com/farmerbriantee/AgOpenGPS) ?
 
