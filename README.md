@@ -6,6 +6,8 @@ Are you looking for [AgOpenGPS Repository](https://github.com/farmerbriantee/AgO
 
 For the [Latest AgOpenGPS Release](https://github.com/farmerbriantee/AgOpenGPS/releases) ?
 
+The [AgOpenGPS Wiki](https://github.com/farmerbriantee/AgOpenGPS_Boards/wiki)
+
 In this repository are many files containing the firmware and pcb layouts to make the hardware for AgOpenGPS.
 
 The Arduino folder contains all the "older" firmware that worked with the Nano for steering, machine control, and the no longer used external IMU.
