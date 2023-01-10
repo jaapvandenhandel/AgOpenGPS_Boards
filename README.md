@@ -1,6 +1,8 @@
 # START HERE
 
-Are you looking for [AgOpenGPS](https://github.com/farmerbriantee/AgOpenGPS) ?
+Are you looking for [AgOpenGPS Repository](https://github.com/farmerbriantee/AgOpenGPS) ?
+
+For the [Latest AgOpenGPS Release](https://github.com/farmerbriantee/AgOpenGPS/releases) ?
 
 In this repository are many files containing the firmware and pcb layouts to make the hardware for AgOpenGPS.
 
