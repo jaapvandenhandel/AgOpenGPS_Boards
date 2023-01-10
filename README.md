@@ -1,8 +1,6 @@
 # START HERE
 
-First off, AgOpenGPS is available here:
-
-{% embed url="https://github.com/farmerbriantee/AgOpenGPS" %}
+Are you looking for [AgOpenGPS](https://github.com/farmerbriantee/AgOpenGPS) ?
 
 In this repository are many files containing the firmware and pcb layouts to make the hardware for AgOpenGPS.
 
