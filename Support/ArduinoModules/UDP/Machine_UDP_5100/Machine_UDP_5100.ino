@@ -14,7 +14,7 @@
     //-----------------------------------------------------------------------------------------------
 
     #include <EEPROM.h> 
-    #include <Wire.h>
+    
     #include <Ethernet.h>
     #include <EthernetUdp.h>
 
@@ -148,6 +148,7 @@
 
         // Open serial communications and wait for port to open:
         Serial.begin(38400);
+        delay(1000);
 
         // Check for Ethernet hardware present
         if (Ethernet.hardwareStatus() == EthernetNoHardware) {
@@ -163,6 +164,15 @@
         // start UDP listen to module port
         Udp.begin(8888);
 
+        Serial.println("This IP:");
+        Serial.print(myip[0]);
+        Serial.print(".");
+        Serial.print(myip[1]); 
+        Serial.print(".");                       
+        Serial.print(myip[2]);
+        Serial.println(".255");
+
+        Serial.println("Setup complete, waiting for AgOpenGPS");
         //set the pins to be outputs (pin numbers)
         pinMode(4, OUTPUT);
         pinMode(5, OUTPUT);
@@ -170,8 +180,6 @@
         pinMode(7, OUTPUT);
         pinMode(8, OUTPUT);
         pinMode(9, OUTPUT);
-
-        Serial.println("Setup complete, waiting for AgOpenGPS");
     }
 
     void loop()
@@ -334,7 +342,6 @@
                     Udp.endPacket();                
                 }
 
-
                 else if (udpData[3] == 238)
                 {
                     aogConfig.raiseTime = udpData[5];
@@ -365,7 +372,7 @@
                         networkAddress.ipOne = udpData[7];
                         networkAddress.ipTwo = udpData[8];
                         networkAddress.ipThree = udpData[9];
-
+                        
                         //save in EEPROM and restart
                         EEPROM.put(50, networkAddress);
                         resetFunc();
