@@ -6,25 +6,24 @@
    * So don't claim it as your own
    */
 
-    //-----------------------------------------------------------------------------------------------
-    // Change this number to reset and reload default parameters to EEPROM
-    #define EEP_Ident 0x5426  
-
-    //Enter your Subnet Address - Important !!
-    struct ConfigIP {
-        uint8_t ipOne = 192;
-        uint8_t ipTwo = 168;
-        uint8_t ipThree = 1;
-    };  ConfigIP networkAddress;   //3 bytes
-
-    //-----------------------------------------------------------------------------------------------
-
     #include <EEPROM.h> 
     #include <Wire.h>
     #include "EtherCard_AOG.h"
     #include <IPAddress.h>
     #include "BNO08x_AOG.h"
   
+    //-----------------------------------------------------------------------------------------------
+    // Change this number to reset and reload default parameters to EEPROM
+    #define EEP_Ident 0x5420  
+
+    //the default network address
+    struct ConfigIP {
+        uint8_t ipOne = 192;
+        uint8_t ipTwo = 168;
+        uint8_t ipThree = 1;
+    };  ConfigIP networkAddress;   //4 bytes
+
+    //-----------------------------------------------------------------------------------------------
     //decimal 121 = 79 hex
     
     // ethernet interface ip network address and host address 121
@@ -102,15 +101,15 @@
 
         EEPROM.get(0, EEread);              // read identifier
 
-        //if (EEread != EEP_Ident)   // check on first start and write EEPROM
-        //{
-        //    EEPROM.put(0, EEP_Ident);
-        //    EEPROM.put(4, networkAddress);
-        //}
-        //else
-        //{
-        //    EEPROM.get(4, networkAddress);
-        //}
+        if (EEread != EEP_Ident)   // check on first start and write EEPROM
+        {
+            EEPROM.put(0, EEP_Ident);
+            EEPROM.put(4, networkAddress);
+        }
+        else
+        {
+            EEPROM.get(4, networkAddress);
+        }
 
         //test if CMPS working
         uint8_t error;
@@ -340,6 +339,23 @@
                 }
             }
 
+
+            else if (udpData[3] == 201)
+            {
+                //make really sure this is the subnet pgn
+                if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
+                {
+                    networkAddress.ipOne = udpData[7];
+                    networkAddress.ipTwo = udpData[8];
+                    networkAddress.ipThree = udpData[9];
+
+                    //save in EEPROM and restart
+                    EEPROM.put(4, networkAddress);
+                    resetFunc();
+                }
+            }
+
+
             //whoami
             else if (udpData[3] == 202)
             {
@@ -365,20 +381,5 @@
                     ether.sendUdp(scanReply, sizeof(scanReply), portMy, ipDest, portDest);
                 }
             }
-
-            //else if (udpData[3] == 201)
-            //{
-            //    //make really sure this is the subnet pgn
-            //    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
-            //    {
-            //        networkAddress.ipOne = udpData[7];
-            //        networkAddress.ipTwo = udpData[8];
-            //        networkAddress.ipThree = udpData[9];
-            //        //save in EEPROM and restart
-            //        EEPROM.put(4, networkAddress);
-            //        resetFunc();
-            //    }
-            //}
-
         }
     }

@@ -1,18 +1,16 @@
     //Machine Control - Brian Tee - Cut and paste from everywhere
 
 
-    //-----------------User Settings ----------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------
+    // Change this number to reset and reload default parameters To EEPROM
+    #define EEP_Ident 0x5422  
     
-    //Enter your subnet Address here.   Important !!!
+    //the default network address
     struct ConfigIP {
         uint8_t ipOne = 192;
         uint8_t ipTwo = 168;
         uint8_t ipThree = 1;
     };  ConfigIP networkAddress;   //3 bytes
-
-    // Change this number to reset and reload default parameters To EEPROM
-    #define EEP_Ident 0x5422 
-
     //-----------------------------------------------------------------------------------------------
 
     #include <EEPROM.h> 
@@ -72,8 +70,7 @@
     17,18    Hyd Up, Hyd Down,
     19 Tramline,
     20: Geo Stop
-    21,22,23 - unused so far*/ 
-
+    21,22,23 - unused so far*/    
     uint8_t pin[] = { 1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     //read value from Machine data and set 1 or zero according to list
@@ -109,13 +106,14 @@
     //The variables used for storage
     uint8_t relayHi = 0, relayLo = 0, tramline = 0, uTurn = 0, hydLift = 0, geoStop = 0;
     float gpsSpeed;
-    uint8_t raiseTimer = 0, lowerTimer = 0, lastTrigger = 0; 
+    uint8_t raiseTimer = 0, lowerTimer = 0, lastTrigger = 0;
+ 
 
     void setup()
     {
+
         //set the baud rate
         Serial.begin(38400);
-
         //while (!Serial) { ; } // wait for serial port to connect. Needed for native USB
 
         EEPROM.get(0, EEread);              // read identifier
@@ -125,13 +123,13 @@
             EEPROM.put(0, EEP_Ident);
             EEPROM.put(6, aogConfig);
             EEPROM.put(20, pin);
-            //EEPROM.put(50, networkAddress);
+            EEPROM.put(50, networkAddress);
         }
         else
         {
             EEPROM.get(6, aogConfig);
             EEPROM.get(20, pin);
-            //EEPROM.get(50, networkAddress);
+            EEPROM.get(50, networkAddress);
         }
 
         if (ether.begin(sizeof Ethernet::buffer, mymac, CS_Pin) == 0)
@@ -354,6 +352,21 @@
                 //resetFunc();
             }
 
+            else if (udpData[3] == 201)
+            {
+                //make really sure this is the subnet pgn
+                if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
+                {
+                    networkAddress.ipOne = udpData[7];
+                    networkAddress.ipTwo = udpData[8];
+                    networkAddress.ipThree = udpData[9];
+
+                    //save in EEPROM and restart
+                    EEPROM.put(50, networkAddress);
+                    resetFunc();
+                }
+            }
+
             //whoami
             else if (udpData[3] == 202)
             {
@@ -390,21 +403,6 @@
                 //save in EEPROM and restart
                 EEPROM.put(20, pin);
             }
-
-            //else if (udpData[3] == 201)
-            //{
-            //    //make really sure this is the subnet pgn
-            //    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
-            //    {
-            //        networkAddress.ipOne = udpData[7];
-            //        networkAddress.ipTwo = udpData[8];
-            //        networkAddress.ipThree = udpData[9];
-            //        //save in EEPROM and restart
-            //        EEPROM.put(50, networkAddress);
-            //        resetFunc();
-            //    }
-            //}
-
         }
     }
 
