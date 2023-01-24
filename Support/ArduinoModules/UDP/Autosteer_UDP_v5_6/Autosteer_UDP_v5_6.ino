@@ -6,15 +6,17 @@
     * So don't claim it as your own
     */
 
-    #include <Wire.h>
-    #include <EEPROM.h> 
-    #include "zADS1115.h"
-    #include "EtherCard_AOG.h"
-    #include <IPAddress.h>
-    #include "BNO08x_AOG.h"
-
     ////////////////// User Settings /////////////////////////  
 
+    //     ***** Must Do !  ******
+
+    //Enter Your subnet here - 192.168.5 is the subnet -
+    struct ConfigIP {
+        uint8_t ipOne = 192;
+        uint8_t ipTwo = 168;
+        uint8_t ipThree = 5;
+    };  ConfigIP networkAddress;   //3 bytes
+    
     //How many degrees before decreasing Max PWM
     #define LOW_HIGH_DEGREES 3.0
 
@@ -26,16 +28,17 @@
     #define PWM_Frequency 0
   
     // Change this number to reset and reload default parameters To EEPROM
-    #define EEP_Ident 0x5417
+    #define EEP_Ident 0x4417
 
-    struct ConfigIP {
-        uint8_t ipOne = 192;
-        uint8_t ipTwo = 168;
-        uint8_t ipThree = 1;
-    };  ConfigIP networkAddress;   //3 bytes
+    //////////////////////////////////////////////////////////////////////////////////////////
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    
+    #include <Wire.h>
+    #include <EEPROM.h> 
+    #include "zADS1115.h"
+    #include "EtherCard_AOG.h"
+    #include <IPAddress.h>
+    #include "BNO08x_AOG.h"
+
     // ethernet interface ip address and host address 126
     static uint8_t myip[] = { 0,0,0,126 };
 
@@ -311,13 +314,13 @@
           EEPROM.put(0, EEP_Ident);
           EEPROM.put(10, steerSettings);
           EEPROM.put(40, steerConfig);
-          EEPROM.put(60, networkAddress);
+          //EEPROM.put(60, networkAddress);
       }
       else
       {
           EEPROM.get(10, steerSettings);     // read the Settings
           EEPROM.get(40, steerConfig);
-          EEPROM.get(60, networkAddress);
+          //EEPROM.get(60, networkAddress);
       }
 
       // for PWM High to Low interpolator
@@ -809,21 +812,6 @@
               resetFunc();
           }
 
-          else if (udpData[3] == 201)
-          {
-              //make really sure this is the subnet pgn
-              if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
-              {
-                  networkAddress.ipOne = udpData[7];
-                  networkAddress.ipTwo = udpData[8];
-                  networkAddress.ipThree = udpData[9];
-
-                  //save in EEPROM and restart
-                  EEPROM.put(60, networkAddress);
-                  resetFunc();
-              }
-          }//end FB
-
                       //whoami
           else if (udpData[3] == 202)
           {
@@ -849,6 +837,20 @@
                   ether.sendUdp(scanReply, sizeof(scanReply), portMy, ipDest, portDest);
               }
           }
+
+          //else if (udpData[3] == 201)
+          //{
+          //    //make really sure this is the subnet pgn
+          //    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
+          //    {
+          //        networkAddress.ipOne = udpData[7];
+          //        networkAddress.ipTwo = udpData[8];
+          //        networkAddress.ipThree = udpData[9];
+          //        //save in EEPROM and restart
+          //        EEPROM.put(60, networkAddress);
+          //        resetFunc();
+          //    }
+          //}//end FB
 
       } //end if 80 81 7F  
 

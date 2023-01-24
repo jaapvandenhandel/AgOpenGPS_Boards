@@ -1,16 +1,18 @@
     //Machine Control - Brian Tee - Cut and paste from everywhere
 
+    //-------------------- User Settings ----------------------------------------------------
+    // 
+    //Enter your Subnet Address here:
 
-    //-----------------------------------------------------------------------------------------------
-    // Change this number to reset and reload default parameters To EEPROM
-    #define EEP_Ident 0x5420  
-    
-    //the default network address
     struct ConfigIP {
         uint8_t ipOne = 192;
         uint8_t ipTwo = 168;
         uint8_t ipThree = 1;
     };  ConfigIP networkAddress;   //3 bytes
+
+    // Change this number to reset and reload default parameters To EEPROM
+    #define EEP_Ident 0x5421  
+    
     //-----------------------------------------------------------------------------------------------
 
     #include <EEPROM.h> 
@@ -364,21 +366,6 @@
                     //resetFunc();
                 }
 
-                else if (udpData[3] == 201)
-                {
-                    //make really sure this is the subnet pgn
-                    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
-                    {
-                        networkAddress.ipOne = udpData[7];
-                        networkAddress.ipTwo = udpData[8];
-                        networkAddress.ipThree = udpData[9];
-                        
-                        //save in EEPROM and restart
-                        EEPROM.put(50, networkAddress);
-                        resetFunc();
-                    }
-                }
-
                 //whoami
                 else if (udpData[3] == 202)
                 {
@@ -426,6 +413,22 @@
                     //save in EEPROM and restart
                     EEPROM.put(20, pin);
                 }
+
+                //else if (udpData[3] == 201)
+                //{
+                //    //make really sure this is the subnet pgn
+                //    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
+                //    {
+                //        networkAddress.ipOne = udpData[7];
+                //        networkAddress.ipTwo = udpData[8];
+                //        networkAddress.ipThree = udpData[9];
+                //                 //        
+                //        //save in EEPROM and restart
+                //        EEPROM.put(50, networkAddress);
+                //        resetFunc();
+                //    }
+                //}
+
             }
         }
     }
