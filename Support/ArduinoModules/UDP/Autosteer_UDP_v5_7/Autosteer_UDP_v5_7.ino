@@ -10,11 +10,11 @@
 
     //     ***** Must Do !  ******
 
-    //Enter Your subnet here - 192.168.1 is the current module subnet -
+    //Enter Your subnet here - 192.168.5 is the subnet -
     struct ConfigIP {
         uint8_t ipOne = 192;
         uint8_t ipTwo = 168;
-        uint8_t ipThree = 1;
+        uint8_t ipThree = 5;
     };  ConfigIP networkAddress;   //3 bytes
     
     //How many degrees before decreasing Max PWM
