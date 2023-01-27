@@ -684,9 +684,12 @@
                   //make really sure this is the reply pgn
                   if (udpData[4] == 3 && udpData[5] == 202 && udpData[6] == 202)
                   {
+                      IPAddress rem_ip = Udp.remoteIP();
+                      
                       //hello from AgIO
-                      uint8_t scanReply[] = { 128, 129, 126, 203, 4,
-                          networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 126, 23 };
+                      uint8_t scanReply[] = { 128, 129, 126, 203, 7,
+                          networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 126, 
+                           rem_ip[0],rem_ip[1],rem_ip[2] , 23};
 
                       //checksum
                       int16_t CK_A = 0;

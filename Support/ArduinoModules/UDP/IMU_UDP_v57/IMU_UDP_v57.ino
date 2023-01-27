@@ -14,7 +14,7 @@
   
     //-----------------------------------------------------------------------------------------------
     // Change this number to reset and reload default parameters to EEPROM
-    #define EEP_Ident 0x5420  
+    #define EEP_Ident 0x5421  
 
     //the default network address
     struct ConfigIP {
