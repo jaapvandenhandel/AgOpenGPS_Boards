@@ -394,9 +394,11 @@
                         Serial.print(" . ");
                         Serial.println(123);
 
-                        //hello from AgIO
-                        uint8_t scanReply[] = { 128, 129, 123, 203, 4,
-                            networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 123, 23 };
+                        IPAddress rem_ip = Udp.remoteIP();
+
+                        uint8_t scanReply[] = { 128, 129, 123, 203, 7,
+                          networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 123, 
+                           rem_ip[0],rem_ip[1],rem_ip[2] , 23};
 
                         //checksum
                         int16_t CK_A = 0;

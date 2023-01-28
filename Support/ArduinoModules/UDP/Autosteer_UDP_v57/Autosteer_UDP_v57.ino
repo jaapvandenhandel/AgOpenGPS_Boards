@@ -831,8 +831,8 @@
               if (udpData[4] == 3 && udpData[5] == 202 && udpData[6] == 202)
               {
                   //reply AgIO
-                  uint8_t scanReply[] = { 128, 129, 123, 203, 7,
-                      networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 123,
+                  uint8_t scanReply[] = { 128, 129, 126, 203, 7,
+                      networkAddress.ipOne, networkAddress.ipTwo, networkAddress.ipThree, 126,
                       src_ip[0], src_ip[1], src_ip[2], 23 };
 
                   //checksum

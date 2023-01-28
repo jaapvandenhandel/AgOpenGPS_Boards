@@ -347,7 +347,7 @@ void autosteerLoop()
     if (steerConfig.CurrentSensor)
     {
       sensorSample = (float)analogRead(CURRENT_SENSOR_PIN);
-      sensorSample = (abs(512 - sensorSample)) * 0.5;
+      sensorSample = (abs(775 - sensorSample)) * 0.5;
       sensorReading = sensorReading * 0.7 + sensorSample * 0.3;
       if (sensorReading >= steerConfig.PulseCountMax)
       {
