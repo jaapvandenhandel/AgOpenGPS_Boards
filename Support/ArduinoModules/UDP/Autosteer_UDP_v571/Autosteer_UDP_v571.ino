@@ -240,13 +240,13 @@
           Serial.println("Error = 0");
           Serial.print("CMPS14 ADDRESs: 0x");
           Serial.println(CMPS14_ADDRESS, HEX);
-          Serial.println("CMPS14 Ok.");
+          Serial.println("CMPS14 Ok.\r\n");
           useCMPS = true;
       }
       else
       {
           Serial.println("Error = 4");
-          Serial.println("CMPS not Connected or Found");
+          Serial.println("CMPS not Connected or Found\r\n");
           useCMPS = false;
       }
 
@@ -267,7 +267,7 @@
                   Serial.println("Error = 0");
                   Serial.print("BNO08X ADDRESs: 0x");
                   Serial.println(bno08xAddress, HEX);
-                  Serial.println("BNO08X Ok.");
+                  Serial.println("BNO08X Ok.\r\n");
 
                   // Initialize BNO080 lib        
                   if (bno08x.begin(bno08xAddress))
@@ -288,7 +288,7 @@
                       }
                       else
                       {
-                          Serial.println("BNO08x init fails!!");
+                          Serial.println("BNO08x init fails!!\r\n");
                       }
                   }
                   else
@@ -339,6 +339,7 @@
       ipDestination[1] = networkAddress.ipTwo;
       ipDestination[2] = networkAddress.ipThree;
 
+      Serial.println();
       //set up connection
       ether.staticSetup(myip, gwip, myDNS, mask);
       ether.printIp("_IP_: ", ether.myip);
@@ -348,7 +349,7 @@
       //register to port 8888
       ether.udpServerListenOnPort(&udpSteerRecv, 8888);
 
-      Serial.println("Setup complete, waiting for AgOpenGPS");
+      Serial.println("\r\nSetup complete, waiting for AgOpenGPS");
 
       adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); //128 samples per second
       adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V);
@@ -848,6 +849,16 @@
 
                   //off to AOG
                   ether.sendUdp(scanReply, sizeof(scanReply), portMy, ipDest, portDest);
+
+                  Serial.print("CurrentSensor: ");
+                  Serial.println(sensorReading);
+                  Serial.print("Steer Counts: ");
+                  Serial.println(helloSteerPosition);
+                  Serial.print("Switch Byte: ");
+                  Serial.println(switchByte);
+                  Serial.println(" --------- \r\n");
+
+
               }
           }
 
