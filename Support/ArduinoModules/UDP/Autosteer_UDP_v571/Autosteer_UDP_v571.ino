@@ -819,6 +819,13 @@
                   networkAddress.ipTwo = udpData[8];
                   networkAddress.ipThree = udpData[9];
 
+                  Serial.print("\r\n Subnet Changed to: ");
+                  Serial.print(udpData[7]); Serial.print(" . ");
+                  Serial.print(udpData[8]); Serial.print(" . ");
+                  Serial.print(udpData[9]); Serial.println();
+
+                  delay(100);
+
                   //save in EEPROM and restart
                   EEPROM.put(60, networkAddress);
                   resetFunc();
@@ -847,18 +854,28 @@
                   static uint8_t ipDest[] = { 255,255,255,255 };
                   uint16_t portDest = 9999; //AOG port that listens
 
+                  Serial.print("\r\nAdapter IP: ");
+                  Serial.print(src_ip[0]); Serial.print(" . ");
+                  Serial.print(src_ip[1]); Serial.print(" . ");
+                  Serial.print(src_ip[2]); Serial.print(" . ");
+                  Serial.print(src_ip[3]);
+                  
                   //off to AOG
                   ether.sendUdp(scanReply, sizeof(scanReply), portMy, ipDest, portDest);
 
+                  Serial.print("\r\n Module IP: ");
+                  Serial.print(src_ip[0]); Serial.print(" . ");
+                  Serial.print(src_ip[1]); Serial.print(" . ");
+                  Serial.print(src_ip[2]); Serial.print(" . ");
+                  Serial.print(src_ip[3]); Serial.println();
+ 
                   Serial.print("CurrentSensor: ");
                   Serial.println(sensorReading);
                   Serial.print("Steer Counts: ");
                   Serial.println(helloSteerPosition);
                   Serial.print("Switch Byte: ");
                   Serial.println(switchByte);
-                  Serial.println(" --------- \r\n");
-
-
+                  Serial.println(" --------- ");
               }
           }
 
