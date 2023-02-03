@@ -365,7 +365,7 @@ void loop()
 
                 do
                 {
-                    uint8_t res[100];
+                    //uint8_t res[100];
 
                     // not needed, get rid of warnings
                     /*
@@ -384,7 +384,7 @@ void loop()
 
                     uint32_t millis_read = systick_millis_count;
                     constexpr uint32_t UART_TIMEOUT = 1000;
-                    int i = 0;
+                    //int i = 0;
 
                     do
                     {
@@ -392,8 +392,9 @@ void loop()
                         
                         while (SerialGPS->available() > 0) 
                         {
-                            res[i++] = SerialGPS->read();
-                            if (i < 100) continue;
+                            SerialGPS->read();
+                            //res[i++] = SerialGPS->read();
+                            //if (i < 100) continue;
                         }
                     } while (systick_millis_count - millis_read < UART_TIMEOUT);
                 } while (!communicationSuccessfull);
