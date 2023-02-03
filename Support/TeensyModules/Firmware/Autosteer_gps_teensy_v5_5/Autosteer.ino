@@ -75,7 +75,7 @@ const uint16_t WATCHDOG_FORCE_VALUE = WATCHDOG_THRESHOLD + 2; // Should be great
 uint8_t watchdogTimer = WATCHDOG_FORCE_VALUE;
 
 //Heart beat hello AgIO
-uint8_t helloFromIMU[] = { 128, 129, 121, 121, 1, 1, 71 };
+uint8_t helloFromIMU[] = { 128, 129, 121, 121, 5, 0, 0, 0, 0, 0, 71 };
 uint8_t helloFromAutoSteer[] = { 0x80, 0x81, 126, 126, 5, 0, 0, 0, 0, 0, 71 };
 int16_t helloSteerPosition = 0;
 
