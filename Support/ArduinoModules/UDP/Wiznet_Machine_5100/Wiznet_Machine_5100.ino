@@ -68,7 +68,7 @@
     uint8_t relayState[] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     //hello from AgIO
-    uint8_t helloFromMachine[] = { 128, 129, 123, 123, 2, 1, 1, 71 };
+    uint8_t helloFromMachine[] = { 128, 129, 123, 123, 5, 0,0,0,0,0, 71 };
 
     const uint8_t LOOP_TIME = 200; //5hz
     uint32_t lastTime = LOOP_TIME;
@@ -325,23 +325,17 @@
                     watchdogTimer = 0;
                 }
 
-                else if (udpData[3] == 200) // Hello from AgIO
+                else if (udpData[3] == 236) //EC Relay Pin Settings 
                 {
-                    if (udpData[7] == 1)
+                    for (uint8_t i = 0; i < 24; i++)
                     {
-                        relayLo -= 255;
-                        relayHi -= 255;
-                        watchdogTimer = 0;
+                        pin[i] = udpData[i + 5];
                     }
 
-                    helloFromMachine[5] = relayLo;
-                    helloFromMachine[6] = relayHi;
-
-                    Udp.beginPacket(ipDestination, portDestination);
-                    Udp.write(helloFromMachine, sizeof(helloFromMachine));
-                    Udp.endPacket();                
+                    //save in EEPROM and restart
+                    EEPROM.put(20, pin);
                 }
-
+                
                 else if (udpData[3] == 238)
                 {
                     aogConfig.raiseTime = udpData[5];
@@ -364,25 +358,27 @@
                     //resetFunc();
                 }
 
-                else if (udpData[3] == 201)
+                else if (udpData[3] == 200) // Hello from AgIO
                 {
-                    //make really sure this is the subnet pgn
-                    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
+                    if (udpData[7] == 1)
                     {
-                        networkAddress.ipOne = udpData[7];
-                        networkAddress.ipTwo = udpData[8];
-                        networkAddress.ipThree = udpData[9];
-                        
-                        //save in EEPROM and restart
-                        EEPROM.put(50, networkAddress);
-                        resetFunc();
+                        relayLo -= 255;
+                        relayHi -= 255;
+                        watchdogTimer = 0;
                     }
+
+                    helloFromMachine[5] = relayLo;
+                    helloFromMachine[6] = relayHi;
+
+                    Udp.beginPacket(ipDestination, portDestination);
+                    Udp.write(helloFromMachine, sizeof(helloFromMachine));
+                    Udp.endPacket();                
                 }
 
-                //whoami
+                //scan reply
+
                 else if (udpData[3] == 202)
                 {
-                    //make really sure this is the subnet pgn
                     if (udpData[4] == 3 && udpData[5] == 202 && udpData[6] == 202)
                     {
                         Serial.print("WhoAmI: ");
@@ -418,16 +414,21 @@
                     }
                 }
 
-                else if (udpData[3] == 236) //EC Relay Pin Settings 
+                //Change subnet of module
+                else if (udpData[3] == 201)
                 {
-                    for (uint8_t i = 0; i < 24; i++)
+                    //make really sure this is the subnet pgn
+                    if (udpData[4] == 5 && udpData[5] == 201 && udpData[6] == 201)
                     {
-                        pin[i] = udpData[i + 5];
+                        networkAddress.ipOne = udpData[7];
+                        networkAddress.ipTwo = udpData[8];
+                        networkAddress.ipThree = udpData[9];
+                        
+                        //save in EEPROM and restart
+                        EEPROM.put(50, networkAddress);
+                        resetFunc();
                     }
-
-                    //save in EEPROM and restart
-                    EEPROM.put(20, pin);
-                }
+                }                
             }
         }
     }
