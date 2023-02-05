@@ -457,12 +457,6 @@ void loop()
 					uint8_t packetBufCls = 0;
 					uint8_t packetBufId = 0;
 
-					uint16_t packetBufCounter;
-
-					// Rolling checksums
-					uint8_t rollingChecksumA;
-					uint8_t rollingChecksumB;
-
 					do
 					{
 						while (autoBaudSerial->available() > 0)
@@ -495,9 +489,6 @@ void loop()
 								{
 									// Record the class in packetBuf until we know what to do with it
 									packetBufCls = incoming; // (Duplication)
-									rollingChecksumA = 0;    // Reset our rolling checksums here (not when we receive the 0xB5)
-									rollingChecksumB = 0;
-									packetBufCounter = 0;
 								}
 								else if (ubxFrameCounter == 3) // ID
 								{
