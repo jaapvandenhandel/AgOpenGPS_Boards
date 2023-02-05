@@ -421,140 +421,136 @@ void loop()
 
                 // Check baudrate
                 bool communicationSuccessfull = false;
-				uint32_t baudrate = 0;
+				uint32_t baudrate = 0;                
 
-                
+				for (uint32_t i = 0; i < nrBaudrates; i++)
+				{
+					baudrate = baudrates[i];
 
-                for (int i = 0; i < nrBaudrates; i++)
-                {
-                    baudrate = baudrates[i];
+					Serial.print(F("Checking baudrate: "));
+					Serial.println(baudrate);
 
-                    Serial.print(F("Checking baudrate: "));
-                    Serial.println(baudrate);
+					autoBaudSerial->begin(baudrate);
+					delay(100);
 
-                    autoBaudSerial->begin(baudrate);
-                    delay(100);
+					// first send dumb data to make sure its on
+					autoBaudSerial->write(0xFF);
 
-                        // Poll navigation data byte -> UBX-NAV-PVT
-                        byte mon_ver[] = {0xB5, 0x62, 0x0A, 0x04, 0x00, 0x00, 0x0E, 0x34};
+					// Clear
+					while (autoBaudSerial->available() > 0)
+					{
+						autoBaudSerial->read();
+					}
 
-                        // first send dumb data to make sure its on
-                        autoBaudSerial->write(0xFF);
+					// Send request
+					autoBaudSerial->write(mon_rate, 8);
 
-                        // Clear
-                        while (autoBaudSerial->available() > 0)
-                        {
-                            autoBaudSerial->read();
-                        }
+					uint32_t millis_read = systick_millis_count;
+					constexpr uint32_t UART_TIMEOUT = 1000;
+					int ubxFrameCounter = 0;
+					bool isUbx = false;
+					uint8_t incoming = 0;
 
-                        // Send request
-                        autoBaudSerial->write(mon_rate, 8);
+					uint8_t requestedClass = packetCfg.cls;
+					uint8_t requestedID = packetCfg.id;
 
-                        uint32_t millis_read = systick_millis_count;
-                        constexpr uint32_t UART_TIMEOUT = 1000;
-                        int ubxFrameCounter = 0;
-                        bool isUbx = false;
-                        uint8_t incoming = 0;
+					uint8_t packetBufCls = 0;
+					uint8_t packetBufId = 0;
 
-                        uint8_t requestedClass = packetCfg.cls;
-                        uint8_t requestedID = packetCfg.id;
+					uint16_t packetBufCounter;
 
-                        uint8_t packetBufCls = 0;
-                        uint8_t packetBufId = 0;
+					// Rolling checksums
+					uint8_t rollingChecksumA;
+					uint8_t rollingChecksumB;
 
-                        uint16_t packetBufCounter = 0;
+					do
+					{
+						while (autoBaudSerial->available() > 0)
+						{
+							incoming = autoBaudSerial->read();
 
-                        // Rolling checksums
-                        uint8_t rollingChecksumA = 0;
-                        uint8_t rollingChecksumB = 0;
+							if (!isUbx && incoming == UBX_SYNCH_1) // UBX binary frames start with 0xB5, aka μ
+							{
+								ubxFrameCounter = 0;
+								isUbx = true;
+							}
 
-                        bool messagefound = false;
+							if (isUbx)
+							{
+								// Decide what type of response this is
+								if ((ubxFrameCounter == 0) && (incoming != UBX_SYNCH_1))      // ISO 'μ'
+								{
+									isUbx = false;                                            // Something went wrong. Reset.
+								}
+								else if ((ubxFrameCounter == 1) && (incoming != UBX_SYNCH_2)) // ASCII 'b'
+								{
+									isUbx = false;                                            // Something went wrong. Reset.
+								}
+								else if (ubxFrameCounter == 1 && incoming == UBX_SYNCH_2)
+								{
+									// Serial.println("UBX_SYNCH_2");
+									// isUbx should be still true
+								}
+								else if (ubxFrameCounter == 2) // Class
+								{
+									// Record the class in packetBuf until we know what to do with it
+									packetBufCls = incoming; // (Duplication)
+									rollingChecksumA = 0;    // Reset our rolling checksums here (not when we receive the 0xB5)
+									rollingChecksumB = 0;
+									packetBufCounter = 0;
+								}
+								else if (ubxFrameCounter == 3) // ID
+								{
+									// Record the ID in packetBuf until we know what to do with it
+									packetBufId = incoming; // (Duplication)
 
-                        do
-                        {
-                            while (autoBaudSerial->available() > 0)
-                            {
-                                incoming = autoBaudSerial->read();
+									// We can now identify the type of response
+									// If the packet we are receiving is not an ACK then check for a class and ID match
+									if (packetBufCls != UBX_CLASS_ACK)
+									{
+										// This is not an ACK so check for a class and ID match
+										if ((packetBufCls == requestedClass) && (packetBufId == requestedID))
+										{
+											// This is not an ACK and we have a class and ID match
+											communicationSuccessfull = true;
+										}
+										else
+										{
+											// This is not an ACK and we do not have a class and ID match
+											// so we should keep diverting data into packetBuf and ignore the payload
+											isUbx = false;
+										}
+									}
+								}
+							}
 
-                                if (!isUbx && incoming == UBX_SYNCH_1) // UBX binary frames start with 0xB5, aka μ
-                                {
-                                    ubxFrameCounter = 0;
-                                    isUbx = true;
-                                }
+							// Finally, increment the frame counter
+							ubxFrameCounter++;
+						}
+					} while (systick_millis_count - millis_read < UART_TIMEOUT);
 
-                                if (isUbx)
-                                {
-                                    // Decide what type of response this is
-                                    if ((ubxFrameCounter == 0) && (incoming != UBX_SYNCH_1))      // ISO 'μ'
-                                        isUbx = false;                                            // Something went wrong. Reset.
-                                    else if ((ubxFrameCounter == 1) && (incoming != UBX_SYNCH_2)) // ASCII 'b'
-                                        isUbx = false;                                            // Something went wrong. Reset.
+					if (communicationSuccessfull)
+					{
+						break;
+					}
+				}
 
-                                    else if (ubxFrameCounter == 1 && incoming == UBX_SYNCH_2)
-                                    {
-                                        // Serial.println("UBX_SYNCH_2");
-                                        // isUbx should be still true
-                                    }
-                                    else if (ubxFrameCounter == 2) // Class
-                                    {
-                                        // Record the class in packetBuf until we know what to do with it
-                                        packetBufCls = incoming; // (Duplication)
-                                        rollingChecksumA = 0;    // Reset our rolling checksums here (not when we receive the 0xB5)
-                                        rollingChecksumB = 0;
-                                        packetBufCounter = 0;
-                                    }
-                                    else if (ubxFrameCounter == 3) // ID
-                                    {
-                                        // Record the ID in packetBuf until we know what to do with it
-                                        packetBufId = incoming; // (Duplication)
+				if (communicationSuccessfull)
+				{
+					SerialAOG.write(aogSerialCmdBuffer, 6);
+					SerialAOG.print(F("Found reciever at baudrate: "));
+					SerialAOG.println(baudrate);
 
-                                        // We can now identify the type of response
-                                        // If the packet we are receiving is not an ACK then check for a class and ID match
-                                        if (packetBufCls != UBX_CLASS_ACK)
-                                        {
-                                            // This is not an ACK so check for a class and ID match
-                                            if ((packetBufCls == requestedClass) && (packetBufId == requestedID))
-                                            {
-                                                // This is not an ACK and we have a class and ID match
-                                                communicationSuccessfull = true;
-                                            }
-                                            else
-                                            {
-                                                // This is not an ACK and we do not have a class and ID match
-                                                // so we should keep diverting data into packetBuf and ignore the payload
-                                                isUbx = false;
-                                            }
-                                        }
-                                    }
-                                }
+					// Let the configuring program know it can proceed
+					SerialAOG.println("!AOGOK");
+				}
+				else
+				{
+					SerialAOG.println(F("u-blox GNSS not detected. Please check wiring."));
+				}
 
-                                // Finally, increment the frame counter
-                                ubxFrameCounter++;
-                            }
-                        } while (systick_millis_count - millis_read < UART_TIMEOUT);
-
-                        if (communicationSuccessfull)
-                        {
-                            break;
-                        }
-                }
-
-                if (communicationSuccessfull)
-                {
-                    SerialAOG.write(aogSerialCmdBuffer, 6);
-                    SerialAOG.print(F("Found reciever at baudrate: "));
-                    SerialAOG.println(baudrate);
-                    
-                    // Let the configuring program know it can proceed
-                    SerialAOG.println("!AOGOK");
-                }
-                else
-                {
-                    SerialAOG.println(F("u-blox GNSS not detected. Please check wiring."));
-                }
-
-                aogSerialCmdCounter = 0;
-            }
+				aogSerialCmdCounter = 0;
+			}
             // END command. maybe think of a different abbreviation
             else if (aogSerialCmdBuffer[aogSerialCmdCounter] == 'E' && aogSerialCmdBuffer[aogSerialCmdCounter + 1] == 'D')
             {
