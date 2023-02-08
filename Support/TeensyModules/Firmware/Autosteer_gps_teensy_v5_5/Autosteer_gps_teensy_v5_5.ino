@@ -58,7 +58,7 @@ const uint32_t nrBaudrates = sizeof(baudrates)/sizeof(baudrates[0]);
 #define RAD_TO_DEG_X_10 572.95779513082320876798154814105
 
 //Swap BNO08x roll & pitch?
-const bool swapRollPitch = false;
+//const bool swapRollPitch = false;
 
 const bool invertRoll= true;  //Used for IMU with dual antenna
 #define baseLineLimit 5       //Max CM differance in baseline

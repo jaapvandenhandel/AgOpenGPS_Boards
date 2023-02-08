@@ -152,6 +152,7 @@ struct Setup {
   uint8_t CurrentSensor = 0;
   uint8_t PulseCountMax = 5;
   uint8_t IsDanfoss = 0;
+  uint8_t IsUseY_Axis = 0;     //Set to 0 to use X Axis, 1 to use Y avis
 }; Setup steerConfig;               // 9 bytes
 
 void steerConfigInit()
@@ -669,6 +670,7 @@ void ReceiveUdp()
                 if (bitRead(sett, 0)) steerConfig.IsDanfoss = 1; else steerConfig.IsDanfoss = 0;
                 if (bitRead(sett, 1)) steerConfig.PressureSensor = 1; else steerConfig.PressureSensor = 0;
                 if (bitRead(sett, 2)) steerConfig.CurrentSensor = 1; else steerConfig.CurrentSensor = 0;
+                if (bitRead(sett, 3)) steerConfig.IsUseY_Axis = 1; else steerConfig.IsUseY_Axis = 0;
 
                 //crc
                 //autoSteerUdpData[13];
