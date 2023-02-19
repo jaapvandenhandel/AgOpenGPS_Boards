@@ -94,7 +94,7 @@ uint32_t gpsReadyTime = 0;        //Used for GGA timeout
 struct ConfigIP {
     uint8_t ipOne = 192;
     uint8_t ipTwo = 168;
-    uint8_t ipThree = 1;
+    uint8_t ipThree = 5;
 };  ConfigIP networkAddress;   //3 bytes
 
 // IP & MAC address of this module of this module
