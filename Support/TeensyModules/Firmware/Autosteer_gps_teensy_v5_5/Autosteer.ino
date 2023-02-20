@@ -647,7 +647,7 @@ void ReceiveUdp()
                 steerSettingsInit();
             }
 
-            else if (autoSteerUdpData[3] == 0xFB && Autosteer_running)  //251 FB - SteerConfig
+            else if (autoSteerUdpData[3] == 0xFB)  //251 FB - SteerConfig
             {
                 uint8_t sett = autoSteerUdpData[5]; //setting0
 
