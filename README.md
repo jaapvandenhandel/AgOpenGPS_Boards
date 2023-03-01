@@ -1,4 +1,4 @@
-# AgOpenGPS PCB and Firmware Repository
+# AgOpenGPS Hardware and Firmware Repository
 
 Click on the green "Code" button above and select "Download Zip" to download the entire support folder.
 
